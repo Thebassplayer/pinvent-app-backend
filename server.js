@@ -3,9 +3,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
 // error handling
 const errorHandler = require("./middleware/errorMiddleware");
+// cookie parser
+const cookieParser = require("cookie-parser");
 
 //Routes
 const userRoutes = require("./routes/userRoute");
@@ -14,8 +15,10 @@ const app = express();
 
 //Middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 
 //Routes Middleware
 app.use("/api/users", userRoutes);

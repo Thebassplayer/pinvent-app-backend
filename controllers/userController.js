@@ -1,8 +1,16 @@
 // Desc: User controller
 const asyncHandler = require("express-async-handler");
-
 // User Model
 const User = require("../models/userModel");
+// Json web token
+const jwt = require("jsonwebtoken");
+
+// Generate token
+const generateToken = id => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
+};
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
@@ -39,6 +47,17 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
+  // Generate Token
+  const token = generateToken(user._id);
+
+  // Send HTTP Only Cookie
+  res.cookie("token", token, {
+    httpOnly: true, // client-side JavaScript cannot access the cookie
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
+    secure: true, // cookie will only be sent over HTTPS
+    sameSite: "none", // cookie will only be sent in cross-site requests
+  });
+
   if (user) {
     const { _id, username, email, photo, phone, bio } = user;
     res.status(201).json({
@@ -48,6 +67,7 @@ const registerUser = asyncHandler(async (req, res) => {
       photo,
       phone,
       bio,
+      token,
     });
   } else {
     res.status(400);
