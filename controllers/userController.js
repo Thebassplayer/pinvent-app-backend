@@ -1,4 +1,7 @@
+// Desc: User controller
 const asyncHandler = require("express-async-handler");
+
+// User Model
 const User = require("../models/userModel");
 
 const registerUser = asyncHandler(async (req, res) => {
