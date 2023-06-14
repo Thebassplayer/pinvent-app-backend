@@ -4,12 +4,18 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+//Routes
+const userRoutes = require("./routes/userRoute");
+
 const app = express();
 
 //Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+//Routes Middleware
+app.use("/api/users", userRoutes);
 
 // Routes
 
