@@ -211,6 +211,53 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+// Change Password
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { oldPassword, password } = req.body;
+
+  // Check if user exists
+  if (!user) {
+    res.status(404);
+    throw new Error("User Not Found, please sigup");
+  }
+
+  // Validate passwords
+  if (!oldPassword || !password) {
+    res.status(400);
+    throw new Error("Please fill in all required fields");
+  }
+
+  // Check if old password matches in DB
+  const passwordIsCorrect = await bcrypt.compare(oldPassword, user.password);
+  if (!passwordIsCorrect) {
+    res.status(400);
+    throw new Error("Old password is incorrect");
+  }
+
+  // Check if new password have is at least 8 characters, containds one special character, number, uppercase, lowercase
+  if (
+    !password.match(
+      /^(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,}$/
+    )
+  ) {
+    res.status(400);
+    throw new Error(
+      "Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter, one number and one special character"
+    );
+  }
+
+  // Save new password
+  if (user && passwordIsCorrect) {
+    user.password = password;
+    await user.save();
+    res.status(200).send("Password updated successfully");
+  } else {
+    res.status(400);
+    throw new Error("Invalid email or password");
+  }
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -218,4 +265,5 @@ module.exports = {
   getUser,
   loginStatus,
   updateUser,
+  changePassword,
 };
