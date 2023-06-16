@@ -160,9 +160,62 @@ const getUser = asyncHandler(async (req, res) => {
   }
 });
 
+// Login Status
+const loginStatus = asyncHandler(async (req, res) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.json(false);
+  }
+
+  // Verify Token
+  const verified = jwt.verify(token, process.env.JWT_SECRET);
+  if (verified) {
+    return res.json(true);
+  }
+  res.json(false);
+});
+
+// Update User
+const updateUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    const { username, email, photo, phone, bio } = user;
+    const {
+      username: updatedUsername,
+      photo: updatedPhoto,
+      phone: updatedPhone,
+      bio: updatedBio,
+    } = req.body;
+
+    user.username = updatedUsername || username;
+    user.email = email;
+    user.photo = updatedPhoto || photo;
+    user.phone = updatedPhone || phone;
+    user.bio = updatedBio || bio;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      photo: updatedUser.photo,
+      phone: updatedUser.phone,
+      bio: updatedUser.bio,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User Not Found");
+  }
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logout,
   getUser,
+  loginStatus,
+  updateUser,
 };
