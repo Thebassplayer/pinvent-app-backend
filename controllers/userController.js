@@ -126,7 +126,21 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+// -- Logout user --
+const logout = asyncHandler(async (req, res) => {
+  // Send HTTP Only Cookie
+  res.cookie("token", "", {
+    httpOnly: true, // client-side JavaScript cannot access the cookie
+    expires: new Date(0),
+    secure: true, // cookie will only be sent over HTTPS
+    sameSite: "none", // cookie will only be sent in cross-site requests
+  });
+
+  res.status(200).json({ message: "User logged out" });
+});
+
 module.exports = {
   registerUser,
   loginUser,
+  logout,
 };
