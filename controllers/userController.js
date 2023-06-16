@@ -1,4 +1,4 @@
-// Desc: User controller
+// Async Handler
 const asyncHandler = require("express-async-handler");
 // User Model
 const User = require("../models/userModel");
@@ -57,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
   res.cookie("token", token, {
     httpOnly: true, // client-side JavaScript cannot access the cookie
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-    secure: true, // cookie will only be sent over HTTPS
+    secure: process.env.NODE_ENV === "development" ? false : true, // cookie will only be sent over HTTPS
     sameSite: "none", // cookie will only be sent in cross-site requests
   });
 
@@ -101,12 +101,13 @@ const loginUser = asyncHandler(async (req, res) => {
   // Generate Token
   const token = generateToken(user._id);
 
-  // Send HTTP Only Cookie
+  // Send HTTP-only cookie
   res.cookie("token", token, {
-    httpOnly: true, // client-side JavaScript cannot access the cookie
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-    secure: true, // cookie will only be sent over HTTPS
-    sameSite: "none", // cookie will only be sent in cross-site requests
+    path: "/",
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 86400), // 1 day
+    sameSite: "none",
+    secure: process.env.NODE_ENV === "development" ? false : true,
   });
 
   if (user && passwordIsCorrect) {
@@ -132,15 +133,36 @@ const logout = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true, // client-side JavaScript cannot access the cookie
     expires: new Date(0),
-    secure: true, // cookie will only be sent over HTTPS
+    secure: process.env.NODE_ENV === "development" ? false : true, // cookie will only be sent over HTTPS
     sameSite: "none", // cookie will only be sent in cross-site requests
   });
 
   res.status(200).json({ message: "User logged out" });
 });
 
+// Get User Data
+const getUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    const { _id, name, email, photo, phone, bio } = user;
+    res.status(200).json({
+      _id,
+      name,
+      email,
+      photo,
+      phone,
+      bio,
+    });
+  } else {
+    res.status(400);
+    throw new Error("User Not Found");
+  }
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logout,
+  getUser,
 };
