@@ -6,6 +6,11 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 // Bcrypt
 const bcrypt = require("bcryptjs");
+// Token Model
+const Token = require("../models/tokenModel");
+// Crypto
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 // Generate token function
 const generateToken = id => {
@@ -260,7 +265,102 @@ const changePassword = asyncHandler(async (req, res) => {
 
 // Forgot Password
 const forgotPassword = asyncHandler(async (req, res) => {
-  res.send("Forgot Password Route");
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User Not Found, please sigup");
+  }
+
+  // Delete any existing reset tokens in DB for this user
+  await Token.deleteMany({ userId: user._id });
+
+  // Generate Token
+  let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+  console.log(resetToken);
+
+  // Hash Token and save to DB
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Save reset token to DB
+  await new Token({
+    userId: user._id,
+    token: hashedToken,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 1000 * 60 * 30, // 30 minutes
+  }).save();
+
+  // Construct reset password URL
+  const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
+
+  // Reset password email template
+
+  const message = `
+  <h2>Hello ${user.username}</h2>
+  <p>Pl ease, use the url below to reset your password</p>
+  <p>This reset link is valid for only 30 minutes</p>
+  <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+  <p>Regards</p>
+  <p>Pinvent Team</p>`;
+
+  const subject = "Passwrod Reset Request";
+  const send_to = user.email;
+  const sent_from = process.env.EMAIL_USERNAME;
+
+  try {
+    await sendEmail(subject, message, send_to, sent_from);
+    res.status(200).json({
+      succes: true,
+      message: "Password reset link sent to your email",
+    });
+  } catch (error) {
+    res.status(400);
+    throw new Error("Email could not be sent");
+  }
+});
+
+// Reset Password
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+  const { resetToken } = req.params;
+
+  // Hash token, the compare it to the hashed token in DB
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Check if token exists in DB
+  const userToken = await Token.findOne({
+    token: hashedToken,
+    expiresAt: { $gt: Date.now() },
+  });
+
+  if (!userToken) {
+    res.status(400);
+    throw new Error("Invalid or expired password reset token");
+  }
+
+  // Find user by token
+  const user = await User.findById(userToken.userId);
+
+  // Check if the new password is the same as the old password
+  if (await bcrypt.compare(password, user.password)) {
+    res.status(400);
+    throw new Error("New password must be different from the old password");
+  }
+
+  user.password = password;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Password reset successful, please login",
+  });
 });
 
 module.exports = {
@@ -272,4 +372,5 @@ module.exports = {
   updateUser,
   changePassword,
   forgotPassword,
+  resetPassword,
 };
