@@ -7,9 +7,11 @@ const cors = require("cors");
 const errorHandler = require("./middleware/errorMiddleware");
 // cookie parser
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 //Routes
 const userRoutes = require("./routes/userRoute");
+const productRoutes = require("./routes/productRoute");
 
 const app = express();
 
@@ -20,8 +22,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+
 //Routes Middleware
 app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
 
 // Routes
 app.get("/", (req, res) => {

@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema(
       required: [true, "Please add a category"],
       trim: true,
     },
-    cuantity: {
+    quantity: {
       type: Number,
       required: [true, "Please add a cuantity"],
       default: 0,
