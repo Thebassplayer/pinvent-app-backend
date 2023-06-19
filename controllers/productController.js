@@ -11,6 +11,7 @@ const filestack = require("filestack-js");
 const apiKey = process.env.FILESTACK_API_KEY;
 const client = filestack.init(apiKey);
 
+// -- Create product --
 const createProduct = asyncHandler(async (req, res) => {
   const { name, sku, category, quantity, price, description } = req.body;
 
@@ -25,23 +26,21 @@ const createProduct = asyncHandler(async (req, res) => {
 
   if (req.file) {
     // Upload image to filestack
+    let uploadedFile;
     try {
       const file = req.file;
-
-      client.upload(file.path).then(res => {
-        console.log(`File uploaded successfully: ${res.url}`);
-      });
+      uploadedFile = await client.upload(file.path);
+      fileData = {
+        name: req.file.originalname,
+        url: uploadedFile.url,
+        fileType: req.file.mimetype,
+        fileSize: fileSizeFormatter(req.file.size, 2),
+      };
     } catch (error) {
       console.log(error);
       res.status(500);
       throw new Error("Image upload failed");
     }
-    fileData = {
-      name: req.file.originalname,
-      url: req.file.path,
-      fileType: req.file.mimetype,
-      fileSize: fileSizeFormatter(req.file.size, 2),
-    };
   }
 
   // Create product
@@ -58,6 +57,42 @@ const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json(product);
 });
 
+// -- Get all products --
+const getProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find({
+    user: req.user._id,
+  }).sort("-createdAt");
+  res.status(200).json(products);
+});
+
+// -- Get product by ID --
+const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product || product.user.toString() !== req.user._id.toString()) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+  res.status(200).json(product);
+});
+
+// -- Delete product --
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product || product.user.toString() !== req.user._id.toString()) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+  await product.deleteOne({ _id: req.params.id });
+  res.status(200).json({ message: "Product removed" });
+});
+
+// -- Update product --
+const updateProduct = asyncHandler(async (req, res) => {});
+
 module.exports = {
   createProduct,
+  getProducts,
+  getProductById,
+  deleteProduct,
+  updateProduct,
 };
