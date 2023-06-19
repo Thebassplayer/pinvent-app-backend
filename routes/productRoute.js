@@ -12,10 +12,9 @@ const {
   updateProduct,
 } = require("../controllers/productController");
 
-// File Upload
-const { upload } = require("../utils/fileUpload");
+// Product routes
 
-router.post("/", protect, upload.single("image"), createProduct);
+router.post("/", protect, createProduct);
 router.get("/", protect, getProducts);
 router.get("/:id", protect, getProductById);
 router.delete("/:id", protect, deleteProduct);
