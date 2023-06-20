@@ -13,6 +13,7 @@ const client = filestack.init(apiKey);
 
 // -- Create product --
 const createProduct = asyncHandler(async (req, res) => {
+  console.log(req.body);
   const { name, sku, category, quantity, price, description } = req.body;
 
   // Validate data

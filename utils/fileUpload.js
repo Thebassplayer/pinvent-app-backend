@@ -2,9 +2,9 @@ const multer = require("multer");
 
 // Define file storage
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads");
-  },
+  // destination: (req, file, cb) => {
+  //   cb(null, "uploads");
+  // },
   // Define file name
   filename: (req, file, cb) => {
     cb(

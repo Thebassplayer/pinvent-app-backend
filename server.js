@@ -1,34 +1,53 @@
-const dotenv = require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-// error handling
-const errorHandler = require("./middleware/errorMiddleware");
-// cookie parser
-const cookieParser = require("cookie-parser");
-const path = require("path");
+// Purpose: Server file for backend
 
-//Routes
+// -- Dependencies --
+
+// Environment Variables (dotenv)
+const dotenv = require("dotenv").config();
+// Express
+const express = require("express");
+// Mongoose (MongoDB)
+const mongoose = require("mongoose");
+// Body Parser (JSON)
+const bodyParser = require("body-parser");
+// Cors
+const cors = require("cors");
+// Configurations
+const config = require("./config");
+// Error handling middleware
+const errorHandler = require("./middleware/errorMiddleware");
+// Cookie parser
+const cookieParser = require("cookie-parser");
+// Path module
+const path = require("path");
+// Routes
 const userRoutes = require("./routes/userRoute");
 const productRoutes = require("./routes/productRoute");
+const developmentTools = require("./dev/mongoDB/mongoDBFunctionalities");
 
+// -- App --
+
+// Create Express app
 const app = express();
 
-//Middleware
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
+// Serve static files from the "/uploads" directory
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
-//Routes Middleware
+// Routes Middleware
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
+if (process.env.NODE_ENV === "development") {
+  app.use("/api/development", developmentTools);
+}
 
-// Routes
+// Default route
 app.get("/", (req, res) => {
   res.send("Home Page");
 });
@@ -36,7 +55,7 @@ app.get("/", (req, res) => {
 // Error Handler Middleware
 app.use(errorHandler);
 
-// Connect to MongoDB and start server
+// Connect to MongoDB and start the server
 const PORT = process.env.PORT || 5002;
 
 mongoose
