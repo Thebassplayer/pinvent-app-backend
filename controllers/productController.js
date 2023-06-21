@@ -9,12 +9,10 @@ const { fileSizeFormatter } = require("../utils/fileUpload");
 // Filestack
 const filestack = require("filestack-js");
 const apiKey = process.env.FILESTACK_API_KEY;
-const secretKey = process.env.FILESTACK_SECRET_KEY;
 const client = filestack.init(apiKey);
 
 // -- Create product --
 const createProduct = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { name, sku, category, quantity, price, description } = req.body;
 
   // Validate data
@@ -40,7 +38,7 @@ const createProduct = asyncHandler(async (req, res) => {
         fileSize: fileSizeFormatter(req.file.size, 2),
       };
     } catch (error) {
-      console.log(error);
+      console.log("Error: ", error);
       res.status(500);
       throw new Error("Image upload failed");
     }
@@ -90,7 +88,61 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 // -- Update product --
-const updateProduct = asyncHandler(async (req, res) => {});
+const updateProduct = asyncHandler(async (req, res) => {
+  const { name, sku, category, quantity, price, description } = req.body;
+  const { id } = req.params;
+
+  const product = await Product.findById(id);
+  if (!product || product.user.toString() !== req.user._id.toString()) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  // -- Handle image upload --
+
+  // Upload image to filestack
+  let fileData = {};
+
+  if (req.file) {
+    let uploadedFile;
+    try {
+      const file = req.file;
+      uploadedFile = await client.upload(file.path);
+      fileData = {
+        name: req.file.originalname,
+        url: uploadedFile.url,
+        fileType: req.file.mimetype,
+        fileSize: fileSizeFormatter(req.file.size, 2),
+      };
+    } catch (error) {
+      console.log("Error: ", error);
+      res.status(500);
+      throw new Error("Image upload failed");
+    }
+  }
+
+  // Update product
+
+  const updatedProduct = await Product.findByIdAndUpdate(
+    {
+      _id: id,
+    },
+    {
+      name,
+      sku,
+      category,
+      quantity,
+      price,
+      description,
+      image: Object.keys(fileData).length === 0 ? product?.image : fileData,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  res.status(200).json(updatedProduct);
+});
 
 module.exports = {
   createProduct,
