@@ -307,7 +307,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   <p>Regards</p>
   <p>Pinvent Team</p>`;
 
-  const subject = "Passwrod Reset Request";
+  const subject = "Password Reset Request";
   const send_to = user.email;
   const sent_from = process.env.EMAIL_USERNAME;
 

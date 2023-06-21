@@ -23,6 +23,7 @@ const path = require("path");
 // Routes
 const userRoutes = require("./routes/userRoute");
 const productRoutes = require("./routes/productRoute");
+const contactRoutes = require("./routes/contactRoute");
 const developmentTools = require("./dev/mongoDB/mongoDBFunctionalities");
 
 // -- App --
@@ -46,6 +47,7 @@ app.use("/api/products", productRoutes);
 if (process.env.NODE_ENV === "development") {
   app.use("/api/development", developmentTools);
 }
+app.use("/api/contactus", contactRoutes);
 
 // Default route
 app.get("/", (req, res) => {
