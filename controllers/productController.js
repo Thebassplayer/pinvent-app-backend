@@ -9,6 +9,7 @@ const { fileSizeFormatter } = require("../utils/fileUpload");
 // Filestack
 const filestack = require("filestack-js");
 const apiKey = process.env.FILESTACK_API_KEY;
+const secretKey = process.env.FILESTACK_SECRET_KEY;
 const client = filestack.init(apiKey);
 
 // -- Create product --
@@ -22,11 +23,12 @@ const createProduct = asyncHandler(async (req, res) => {
     throw new Error("Please fill all the fields");
   }
 
-  // Handle image
+  // -- Handle image upload --
+
+  // Upload image to filestack
   let fileData = {};
 
   if (req.file) {
-    // Upload image to filestack
     let uploadedFile;
     try {
       const file = req.file;

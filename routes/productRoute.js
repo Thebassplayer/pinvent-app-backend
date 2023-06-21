@@ -11,12 +11,12 @@ const {
   deleteProduct,
   updateProduct,
 } = require("../controllers/productController");
-const { upload } = require("../utils/fileUpload");
+const { upload, handleFileSizeError } = require("../utils/fileUpload");
 
 // Product routes
 
-router.post("/", protect, upload.single("image"), createProduct);
-router.patch("/:id", protect, upload.single("image"), updateProduct);
+router.post("/", protect, upload, handleFileSizeError, createProduct);
+router.patch("/:id", protect, upload, handleFileSizeError, updateProduct);
 router.get("/", protect, getProducts);
 router.get("/:id", protect, getProductById);
 router.delete("/:id", protect, deleteProduct);

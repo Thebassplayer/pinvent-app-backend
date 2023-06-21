@@ -29,11 +29,17 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// Function to check the file size (in bytes)
+const fileSizeLimit = 2 * 1000 * 1000; // 2MB
+
 // Define upload
 const upload = multer({
   storage,
   fileFilter,
-});
+  limits: {
+    fileSize: fileSizeLimit,
+  },
+}).single("image");
 
 // File Size Formatter
 const fileSizeFormatter = (bytes, decimal) => {
@@ -48,4 +54,17 @@ const fileSizeFormatter = (bytes, decimal) => {
   );
 };
 
-module.exports = { upload, fileSizeFormatter };
+// Error handling middleware
+const handleFileSizeError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+    res.status(400).json({
+      error: `File size limit exceeded. Maximum file size allowed is ${fileSizeFormatter(
+        fileSizeLimit
+      )}`,
+    });
+  } else {
+    next(err);
+  }
+};
+
+module.exports = { upload, fileSizeFormatter, handleFileSizeError };

@@ -19,6 +19,7 @@ const usersDummyData = require("./usersDummyData");
 const deleteAllUsers = asyncHandler(async (req, res) => {
   await User.deleteMany();
   res.status(200).json({ message: "All users deleted" });
+  console.log("All users deleted");
 });
 // Create users
 const registerUser = async user => {
