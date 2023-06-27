@@ -38,7 +38,6 @@ const createProduct = asyncHandler(async (req, res) => {
         fileSize: fileSizeFormatter(req.file.size, 2),
       };
     } catch (error) {
-      console.log("Error: ", error);
       res.status(500);
       throw new Error("Image upload failed");
     }
@@ -115,7 +114,6 @@ const updateProduct = asyncHandler(async (req, res) => {
         fileSize: fileSizeFormatter(req.file.size, 2),
       };
     } catch (error) {
-      console.log("Error: ", error);
       res.status(500);
       throw new Error("Image upload failed");
     }

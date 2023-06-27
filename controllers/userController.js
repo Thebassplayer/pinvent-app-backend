@@ -168,10 +168,8 @@ const getUser = asyncHandler(async (req, res) => {
 // Login Status
 const loginStatus = asyncHandler(async (req, res) => {
   const token = req.cookies.token;
-  console.log("req", req);
 
   if (!token) {
-    console.log("Bad token");
     return res.json(false);
   }
 
@@ -280,7 +278,6 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   // Generate Token
   let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
-  console.log(resetToken);
 
   // Hash Token and save to DB
   const hashedToken = crypto
