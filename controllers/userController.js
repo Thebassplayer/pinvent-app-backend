@@ -64,7 +64,6 @@ const registerUser = asyncHandler(async (req, res) => {
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
     sameSite: "none", // cookie will only be sent in cross-site requests
     secure: true,
-    // secure: process.env.NODE_ENV === "development" ? false : true,
   });
 
   if (user) {
@@ -113,7 +112,7 @@ const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     expires: new Date(Date.now() + 1000 * 86400), // 1 day
     sameSite: "none",
-    secure: process.env.NODE_ENV === "development" ? false : true,
+    secure: true,
   });
 
   if (user && passwordIsCorrect) {
@@ -139,8 +138,8 @@ const logout = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true, // client-side JavaScript cannot access the cookie
     expires: new Date(0),
-    secure: process.env.NODE_ENV === "development" ? false : true, // cookie will only be sent over HTTPS
     sameSite: "none", // cookie will only be sent in cross-site requests
+    secure: true,
   });
 
   res.status(200).json({ message: "User logged out" });
@@ -169,8 +168,10 @@ const getUser = asyncHandler(async (req, res) => {
 // Login Status
 const loginStatus = asyncHandler(async (req, res) => {
   const token = req.cookies.token;
+  console.log("req", req);
 
   if (!token) {
+    console.log("Bad token");
     return res.json(false);
   }
 

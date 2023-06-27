@@ -14,6 +14,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 // Configurations
 const config = require("./config");
+// -- Middlewares --
 // Error handling middleware
 const errorHandler = require("./middleware/errorMiddleware");
 // Cookie parser
@@ -42,7 +43,6 @@ app.use(
     credentials: true,
     sameSite: "none",
     secure: true,
-    // secure: process.env.NODE_ENV === "development" ? false : true,
   })
 );
 
