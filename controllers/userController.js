@@ -62,8 +62,9 @@ const registerUser = asyncHandler(async (req, res) => {
   res.cookie("token", token, {
     httpOnly: true, // client-side JavaScript cannot access the cookie
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-    secure: process.env.NODE_ENV === "development" ? false : true, // cookie will only be sent over HTTPS
     sameSite: "none", // cookie will only be sent in cross-site requests
+    secure: true,
+    // secure: process.env.NODE_ENV === "development" ? false : true,
   });
 
   if (user) {

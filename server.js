@@ -40,6 +40,9 @@ app.use(
   cors({
     origin: ["http://localhost:5173", "http://pinvent-app.vercel.app"],
     credentials: true,
+    sameSite: "none",
+    secure: true,
+    // secure: process.env.NODE_ENV === "development" ? false : true,
   })
 );
 
