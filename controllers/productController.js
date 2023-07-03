@@ -1,15 +1,5 @@
 const asyncHandler = require("express-async-handler");
-
-// Product Model
 const Product = require("../models/productModel");
-
-// File Size Formatter
-const { fileSizeFormatter } = require("../utils/fileUpload");
-
-// Filestack
-const filestack = require("filestack-js");
-const apiKey = process.env.FILESTACK_API_KEY;
-const client = filestack.init(apiKey);
 
 // -- Create product --
 const createProduct = asyncHandler(async (req, res) => {
@@ -21,27 +11,8 @@ const createProduct = asyncHandler(async (req, res) => {
     throw new Error("Please fill all the fields");
   }
 
-  // -- Handle image upload --
-
-  // Upload image to filestack
-  let fileData = {};
-
-  if (req.file) {
-    let uploadedFile;
-    try {
-      const file = req.file;
-      uploadedFile = await client.upload(file.path);
-      fileData = {
-        name: req.file.originalname,
-        url: uploadedFile.url,
-        fileType: req.file.mimetype,
-        fileSize: fileSizeFormatter(req.file.size, 2),
-      };
-    } catch (error) {
-      res.status(500);
-      throw new Error("Image upload failed");
-    }
-  }
+  // File data from uploadImageMiddleware
+  const fileData = req.fileData;
 
   // Create product
   const product = await Product.create({

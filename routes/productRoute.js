@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const protect = require("../middleware/authMiddleware");
+const { uploadImage } = require("../middleware/uploadImageMiddleware");
 
 // Controllers
 const {
@@ -14,9 +15,8 @@ const {
 const { upload, handleFileSizeError } = require("../utils/fileUpload");
 
 // Product routes
-
-router.post("/", protect, upload, handleFileSizeError, createProduct);
-router.patch("/:id", protect, upload, handleFileSizeError, updateProduct);
+router.post("/", protect, uploadImage, createProduct);
+router.patch("/:id", protect, uploadImage, updateProduct);
 router.get("/", protect, getProducts);
 router.get("/:id", protect, getProductById);
 router.delete("/:id", protect, deleteProduct);
