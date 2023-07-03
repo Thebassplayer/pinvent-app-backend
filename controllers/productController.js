@@ -4,15 +4,13 @@ const Product = require("../models/productModel");
 // -- Create product --
 const createProduct = asyncHandler(async (req, res) => {
   const { name, sku, category, quantity, price, description } = req.body;
+  const { fileData } = req;
 
   // Validate data
   if (!name || !category || !quantity || !price || !description) {
     res.status(400);
     throw new Error("Please fill all the fields");
   }
-
-  // File data from uploadImageMiddleware
-  const fileData = req.fileData;
 
   // Create product
   const product = await Product.create({
@@ -61,55 +59,39 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const updateProduct = asyncHandler(async (req, res) => {
   const { name, sku, category, quantity, price, description } = req.body;
   const { id } = req.params;
-
+  const { fileData } = req;
+  console.log("Update product Fired @ productController.js");
   const product = await Product.findById(id);
   if (!product || product.user.toString() !== req.user._id.toString()) {
     res.status(404);
     throw new Error("Product not found");
   }
-
-  // -- Handle image upload --
-
-  // Upload image to filestack
-  let fileData = {};
+  let updatedFields = {
+    name,
+    sku,
+    category,
+    quantity,
+    price,
+    description,
+  };
 
   if (req.file) {
-    let uploadedFile;
-    try {
-      const file = req.file;
-      uploadedFile = await client.upload(file.path);
-      fileData = {
-        name: req.file.originalname,
-        url: uploadedFile.url,
-        fileType: req.file.mimetype,
-        fileSize: fileSizeFormatter(req.file.size, 2),
-      };
-    } catch (error) {
-      res.status(500);
-      throw new Error("Image upload failed");
-    }
+    updatedFields.image = fileData;
   }
 
-  // Update product
-
+  // Update product on DB
   const updatedProduct = await Product.findByIdAndUpdate(
     {
       _id: id,
     },
-    {
-      name,
-      sku,
-      category,
-      quantity,
-      price,
-      description,
-      image: Object.keys(fileData).length === 0 ? product?.image : fileData,
-    },
+    updatedFields,
     {
       new: true,
       runValidators: true,
     }
   );
+
+  console.log("Updated Product @ productController: ", updatedProduct);
   res.status(200).json(updatedProduct);
 });
 
