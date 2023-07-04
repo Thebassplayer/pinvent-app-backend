@@ -56,7 +56,7 @@ const fileSizeFormatter = (bytes, decimal) => {
 
 // Upload image middleware
 const uploadImage = (req, res, next) => {
-  upload.single("image")(req, res, async err => {
+  upload(req, res, async err => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({

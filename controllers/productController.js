@@ -79,10 +79,16 @@ const updateProduct = asyncHandler(async (req, res) => {
     image: req.file ? fileData : undefined,
   };
 
-  const updatedProduct = await Product.findByIdAndUpdate(id, updatedFields, {
-    new: true,
-    runValidators: true,
-  });
+  const updatedProduct = await Product.findByIdAndUpdate(
+    {
+      _id: id,
+    },
+    updatedFields,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
   console.log("Updated Product @ productController: ", updatedProduct);
   res.status(200).json(updatedProduct);
