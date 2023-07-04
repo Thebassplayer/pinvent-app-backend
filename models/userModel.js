@@ -34,10 +34,11 @@ const userSchema = mongoose.Schema(
       // ],
     },
     photo: {
-      type: String,
-      required: [true, "Please add a photo"],
-      default:
-        "https://e7.pngegg.com/pngimages/753/432/png-clipart-user-profile-2018-in-sight-user-conference-expo-business-default-business-angle-service-thumbnail.png",
+      type: Object,
+      default: {
+        name: "default_user.png",
+        url: "https://e7.pngegg.com/pngimages/753/432/png-clipart-user-profile-2018-in-sight-user-conference-expo-business-default-business-angle-service-thumbnail.png",
+      },
     },
     phone: {
       type: String,

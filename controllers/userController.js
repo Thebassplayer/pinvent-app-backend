@@ -183,12 +183,13 @@ const loginStatus = asyncHandler(async (req, res) => {
 
 // Update User
 const updateUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
   const { fileData } = req;
+  console.log("fileData @ updateUser: ", fileData);
   const updatedPhoto = fileData ? fileData : undefined;
 
+  const user = await User.findById(req.user._id);
   if (user) {
-    const { username, email, photo, phone, bio } = user;
+    const { username, email, photo } = user;
     const {
       username: updatedUsername,
       phone: updatedPhone,

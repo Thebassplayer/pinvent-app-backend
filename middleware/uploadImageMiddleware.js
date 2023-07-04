@@ -77,6 +77,7 @@ const uploadImage = (req, res, next) => {
       let fileData;
       try {
         const file = req.file;
+        console.log("file @ uploadImageMiddleware: ", file);
         const uploadedFile = await client.upload(file.path);
         fileData = {
           name: req.file.originalname,

@@ -60,6 +60,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { name, sku, category, quantity, price, description } = req.body;
   const { id } = req.params;
   const { fileData } = req;
+  console.log("fileData @ updateProduct: ", fileData);
 
   console.log("Update product Fired @ productController.js");
 
