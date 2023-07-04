@@ -184,12 +184,13 @@ const loginStatus = asyncHandler(async (req, res) => {
 // Update User
 const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
+  const { fileData } = req;
+  const updatedPhoto = fileData ? fileData : undefined;
 
   if (user) {
     const { username, email, photo, phone, bio } = user;
     const {
       username: updatedUsername,
-      photo: updatedPhoto,
       phone: updatedPhone,
       bio: updatedBio,
     } = req.body;

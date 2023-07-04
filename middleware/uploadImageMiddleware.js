@@ -56,19 +56,21 @@ const fileSizeFormatter = (bytes, decimal) => {
 
 // Upload image middleware
 const uploadImage = (req, res, next) => {
-  upload(req, res, async err => {
+  upload.single("image")(req, res, async err => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({
-          error: `File size limit exceeded. Maximum file size allowed is ${fileSizeFormatter(
+          message: `File size limit exceeded. Maximum file size allowed is ${fileSizeFormatter(
             fileSizeLimit
           )}`,
         });
       } else {
-        return res.status(500).json({ error: "Image upload failed" });
+        console.log("@ uploadImageMiddleware: ", err);
+        return res.status(500).json({ message: "Image upload failed" });
       }
     } else if (err) {
-      return res.status(500).json({ error: "Image upload failed" });
+      console.log("@ uploadImageMiddleware: ", err);
+      return res.status(500).json({ message: "Image upload failed" });
     }
 
     if (req.file) {
@@ -83,7 +85,8 @@ const uploadImage = (req, res, next) => {
           fileSize: fileSizeFormatter(req.file.size, 2),
         };
       } catch (error) {
-        return res.status(500).json({ error: "Image upload failed" });
+        console.log("@ uploadImageMiddleware: ", error);
+        return res.status(500).json({ message: "Image upload failed" });
       }
 
       req.fileData = fileData;

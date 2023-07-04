@@ -60,36 +60,29 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { name, sku, category, quantity, price, description } = req.body;
   const { id } = req.params;
   const { fileData } = req;
+
   console.log("Update product Fired @ productController.js");
+
   const product = await Product.findById(id);
   if (!product || product.user.toString() !== req.user._id.toString()) {
     res.status(404);
     throw new Error("Product not found");
   }
-  let updatedFields = {
+
+  const updatedFields = {
     name,
     sku,
     category,
     quantity,
     price,
     description,
+    image: req.file ? fileData : undefined,
   };
 
-  if (req.file) {
-    updatedFields.image = fileData;
-  }
-
-  // Update product on DB
-  const updatedProduct = await Product.findByIdAndUpdate(
-    {
-      _id: id,
-    },
-    updatedFields,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const updatedProduct = await Product.findByIdAndUpdate(id, updatedFields, {
+    new: true,
+    runValidators: true,
+  });
 
   console.log("Updated Product @ productController: ", updatedProduct);
   res.status(200).json(updatedProduct);

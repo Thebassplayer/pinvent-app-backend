@@ -3,6 +3,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Handle MongoDB connection error
   if (err.name === "MongoError") {
+    console.log("@ errorMiddleware: ", err);
     res.status(500).json({ error: "Failed to connect to the database" });
     return;
   }
