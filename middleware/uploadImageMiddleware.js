@@ -65,11 +65,9 @@ const uploadImage = (req, res, next) => {
           )}`,
         });
       } else {
-        console.log("@ uploadImageMiddleware: ", err);
         return res.status(500).json({ message: "Image upload failed" });
       }
     } else if (err) {
-      console.log("@ uploadImageMiddleware: ", err);
       return res.status(500).json({ message: "Image upload failed" });
     }
 
@@ -77,7 +75,7 @@ const uploadImage = (req, res, next) => {
       let fileData;
       try {
         const file = req.file;
-        console.log("file @ uploadImageMiddleware: ", file);
+
         const uploadedFile = await client.upload(file.path);
         fileData = {
           name: req.file.originalname,
@@ -86,7 +84,6 @@ const uploadImage = (req, res, next) => {
           fileSize: fileSizeFormatter(req.file.size, 2),
         };
       } catch (error) {
-        console.log("@ uploadImageMiddleware: ", error);
         return res.status(500).json({ message: "Image upload failed" });
       }
 
