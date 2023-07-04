@@ -42,11 +42,13 @@ const userSchema = mongoose.Schema(
     phone: {
       type: String,
       required: false,
+      default: "",
     },
     bio: {
       type: String,
       required: false,
       max: [250, "Bio must be less than 250 characters"],
+      default: "",
     },
   },
   {

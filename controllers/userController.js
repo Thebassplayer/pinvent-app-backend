@@ -198,8 +198,8 @@ const updateUser = asyncHandler(async (req, res) => {
     user.username = updatedUsername || username;
     user.email = email;
     user.photo = updatedPhoto || photo;
-    user.phone = updatedPhone || phone;
-    user.bio = updatedBio || bio;
+    user.phone = updatedPhone;
+    user.bio = updatedBio;
 
     const updatedUser = await user.save();
 
