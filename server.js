@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: ["http://localhost:5174", "http://pinvent-app.vercel.app"],
+    origin: ["http://localhost:5173", "http://pinvent-app.vercel.app"],
     credentials: true,
     sameSite: "none",
     secure: true,
