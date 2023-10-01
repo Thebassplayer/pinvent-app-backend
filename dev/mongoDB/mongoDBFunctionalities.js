@@ -9,10 +9,6 @@ const axios = require("axios");
 const asyncHandler = require("express-async-handler");
 //? __User Model__
 const User = require("../../models/userModel");
-//? __Password Generator__
-const passwordGenerator = require("generate-password");
-//? __usersDummyData__
-const usersDummyData = require("./usersDummyData");
 
 //? __Controllers__
 // Delete all users from the DB
