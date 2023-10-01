@@ -9,6 +9,8 @@ const axios = require("axios");
 const asyncHandler = require("express-async-handler");
 //? __User Model__
 const User = require("../../models/userModel");
+//? __Backend URL__
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5002";
 
 //? __Controllers__
 // Delete all users from the DB
@@ -21,7 +23,7 @@ const deleteAllUsers = asyncHandler(async (req, res) => {
 const registerUser = async user => {
   try {
     const response = await axios.post(
-      "http://localhost:5002/api/users/register",
+      `${BACKEND_URL}/api/users/register`,
       user
     );
     return response.data;
