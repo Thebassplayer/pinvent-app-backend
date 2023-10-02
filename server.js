@@ -39,7 +39,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", process.env.FRONTEND_URL],
+    origin: [
+      "http://localhost:5173",
+      process.env.FRONTEND_URL,
+      "https://pinventstockapp.netlify.app",
+    ],
     credentials: true,
     sameSite: "none",
     secure: true,
