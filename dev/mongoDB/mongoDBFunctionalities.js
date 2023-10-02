@@ -10,8 +10,10 @@ const asyncHandler = require("express-async-handler");
 //? __User Model__
 const User = require("../../models/userModel");
 //? __Backend URL__
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5002";
-
+const BACKEND_URL =
+  process.env.NODE_ENV === "development"
+    ? process.env.BACKEND_URL || "http://localhost:5002"
+    : process.env.BACKEND_URL;
 //? __Controllers__
 // Delete all users from the DB
 const deleteAllUsers = asyncHandler(async (req, res) => {
